@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/halls")
@@ -21,12 +24,10 @@ public class HallsController {
         this.hallsService = hallsService;
     }
 
-    /**
-     * POST /api/users Создаёт нового пользователя.
-     */
+    /** Создать новый зал */
     @PostMapping
     public ResponseEntity<HallsDto> createHall(@Valid @RequestBody HallsDto dto) {
-        HallsDto created = hallsService.createHalls(dto);
+        HallsDto created = hallsService.createHall(dto);
         URI location = ServletUriComponentsBuilder
             .fromCurrentRequest()
             .buildAndExpand(created.getId())
@@ -34,4 +35,31 @@ public class HallsController {
         return ResponseEntity.created(location).body(created);
     }
 
+    /** Получить список всех залов */
+    @GetMapping
+    public ResponseEntity<List<HallsDto>> listHalls() {
+        return ResponseEntity.ok(hallsService.getAllHalls());
+    }
+
+    /** Получить зал по id */
+    @GetMapping("/{id}")
+    public ResponseEntity<HallsDto> getHall(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(hallsService.getHallById(id));
+    }
+
+    /** Обновить зал по id */
+    @PutMapping("/{id}")
+    public ResponseEntity<HallsDto> updateHall(
+        @PathVariable("id") Integer id,
+        @Valid @RequestBody HallsDto dto
+    ) {
+        return ResponseEntity.ok(hallsService.updateHall(id, dto));
+    }
+
+    /** Удалить зал по id */
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteHall(@PathVariable("id") Integer id) {
+        hallsService.deleteHallById(id);
+        return ResponseEntity.noContent().build();
+    }
 }

@@ -1,6 +1,5 @@
 package com.example.demo.service;
 
-import jakarta.transaction.Transactional;
 import java.util.List;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.DTO.UserDto;
@@ -11,6 +10,7 @@ import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class UserService {
