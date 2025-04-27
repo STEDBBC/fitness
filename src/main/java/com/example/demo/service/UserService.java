@@ -5,8 +5,9 @@ import java.util.List;
 import com.example.demo.mapper.UserMapper;
 import com.example.demo.model.DTO.UserDto;
 import com.example.demo.model.Role;
-import com.example.demo.model.Data.UserData;
+import com.example.demo.model.data.UserData;
 import com.example.demo.repository.UserRepository;
+import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
@@ -82,6 +83,13 @@ public class UserService {
             );
         }
         userRepository.deleteById(id);
+    }
+
+    @Transactional
+    public List<UserDto> getAllUsers() {
+        return userRepository.findAll().stream()
+            .map(userMapper::toDTO)
+            .collect(Collectors.toList());
     }
 
 }

@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Center - Управление пользователями</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; background: #f0f2f5; color: #333; }
+    header { background: #1e1e2f; color: #fff; padding: 1rem 2rem; text-align: center; }
+    header h1 { font-size: 1.8rem; }
+    .container { max-width: 900px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); padding: 2rem; }
+    .toolbar { margin-bottom: 1rem; }
+    .toolbar button { margin-right: 0.5rem; padding: 0.5rem 1rem; border: none; border-radius: 4px; font-size: 0.9rem; cursor: pointer; }
+    .btn-create { background: #28a745; color: #fff; }
+    .btn-edit   { background: #007bff; color: #fff; }
+    .btn-delete { background: #dc3545; color: #fff; }
+    .btn-create:hover { background: #218838; }
+    .btn-edit:hover   { background: #0069d9; }
+    .btn-delete:hover { background: #c82333; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 0.75rem; border: 1px solid #ddd; text-align: left; }
+    th { background: #1e1e2f; color: #fff; }
+    th.select-col, td.select-col { width: 40px; text-align: center; }
+    .hidden { display: none; }
+    .form-group { margin-bottom: 1rem; }
+    .form-group label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
+    .required { color: red; margin-left: 4px; }
+    .form-group input, .form-group select { width: 100%; padding: 0.75rem; border: 1px solid #ccc; border-radius: 4px; font-size: 1rem; background: #fff; }
+    .form-group input::placeholder { color: #888; }
+    /* special grey background for example fields */
+    .example { background: #f5f5f5; }
+    .form-group input:focus, .form-group select:focus { outline: none; border-color: #1e1e2f; }
+    .submit { background: #1e1e2f; color: #fff; }
+    .submit:hover { background: #333; }
+    .alert { padding: 1rem; border-radius: 4px; margin-top: 1rem; font-size: 0.95rem; }
+    .alert-success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .alert-error   { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    footer { text-align: center; padding: 1rem 0; color: #777; font-size: 0.9rem; }
+    @media (max-width: 600px) { .container { margin: 1rem; padding: 1.5rem; } header h1 { font-size: 1.4rem; } }
+  </style>
+</head>
+<body>
+<header><h1>Fitness Center - Управление пользователями</h1></header>
+<div class="container">
+  <!-- Секция списка -->
+  <section id="list-section">
+    <div class="toolbar">
+      <button class="btn-create" id="btnCreate">Создать</button>
+      <button class="btn-edit"   id="btnEdit">Редактировать</button>
+      <button class="btn-delete" id="btnDelete">Удалить</button>
+    </div>
+    <table>
+      <thead>
+      <tr>
+        <th class="select-col"><input type="checkbox" id="selectAll"></th>
+        <th>ID</th><th>Имя</th><th>Фамилия</th><th>Email</th><th>Телефон</th><th>Роль</th>
+      </tr>
+      </thead>
+      <tbody id="usersTable"></tbody>
+    </table>
+  </section>
+
+  <!-- Секция формы создания/редактирования -->
+  <section id="form-section" class="hidden">
+    <h2 id="formTitle">...</h2>
+    <form id="userForm">
+      <div class="form-group"><label>Имя<span class="required">*</span></label><input type="text" id="firstName" placeholder="Иван" required></div>
+      <div class="form-group"><label>Фамилия<span class="required">*</span></label><input type="text" id="lastName" placeholder="Петров" required></div>
+      <div class="form-group"><label>Телефон<span class="required">*</span></label><input type="tel" id="phone" class="example" placeholder="+71234567890" required></div>
+      <div class="form-group"><label>Email<span class="required">*</span></label><input type="email" id="email" class="example" placeholder="ivan.petrov@example.com" required></div>
+      <div class="form-group"><label>Позиция<span class="required">*</span></label><input type="text" id="position" placeholder="Trainer" required></div>
+      <div class="form-group"><label>Пол<span class="required">*</span></label><select id="gender" required><option value="">—</option><option value="M">M</option><option value="F">F</option></select></div>
+      <div class="form-group"><label>Роль<span class="required">*</span></label><select id="role" required><option value="">—</option><option>ADMIN</option><option>TRAINER</option><option>CLIENT</option></select></div>
+      <div class="form-group"><label>Дата рождения<span class="required">*</span></label><input type="date" id="birthDate" required></div>
+      <button type="submit" class="submit">Сохранить</button>
+      <button type="button" id="btnCancel">Отмена</button>
+    </form>
+    <div id="message"></div>
+  </section>
+</div>
+<footer>&copy; 2025 Fitness Center</footer>
+
+<script>
+  // input references
+  const firstNameInput = document.getElementById('firstName');
+  const lastNameInput  = document.getElementById('lastName');
+  const phoneInput     = document.getElementById('phone');
+  const emailInput     = document.getElementById('email');
+  const positionInput  = document.getElementById('position');
+  const genderInput    = document.getElementById('gender');
+  const roleInput      = document.getElementById('role');
+  const birthDateInput = document.getElementById('birthDate');
+
+  const listSection = document.getElementById('list-section');
+  const formSection = document.getElementById('form-section');
+  const formTitle   = document.getElementById('formTitle');
+  let editUserId = null;
+
+  // Загрузить всех пользователей в таблицу
+  async function loadUsers() {
+    const tbody = document.getElementById('usersTable');
+    tbody.innerHTML = '';
+    try {
+      const resp = await fetch('/api/users');
+      const users = await resp.json();
+      users.forEach(u => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td class="select-col"><input type="checkbox" data-id="${u.id}"></td>
+            <td>${u.id}</td><td>${u.firstName || ''}</td><td>${u.lastName || ''}</td>
+            <td>${u.email || ''}</td><td>${u.phone || ''}</td><td>${u.role || ''}</td>`;
+        tbody.appendChild(tr);
+      });
+    } catch {
+      tbody.innerHTML = '<tr><td colspan="7">Ошибка загрузки данных</td></tr>';
+    }
+  }
+
+  // Показать форму создания или редактирования
+  async function showForm(mode) {
+    listSection.classList.add('hidden');
+    formSection.classList.remove('hidden');
+    document.getElementById('message').innerHTML = '';
+    if (mode === 'create') {
+      formTitle.textContent = 'Создать пользователя';
+      editUserId = null;
+      document.getElementById('userForm').reset();
+    } else {
+      const selected = document.querySelectorAll('#usersTable input[type=checkbox]:checked');
+      if (selected.length !== 1) {
+        alert('Выберите одного пользователя для редактирования');
+        return;
+      }
+      editUserId = selected[0].dataset.id;
+      formTitle.textContent = 'Редактировать пользователя ID ' + editUserId;
+      try {
+        const resp = await fetch(`/api/users/${editUserId}`);
+        const u = await resp.json();
+        // заполнить поля
+        firstNameInput.value = u.firstName || '';
+        lastNameInput.value  = u.lastName  || '';
+        phoneInput.value     = u.phone     || '';
+        emailInput.value     = u.email     || '';
+        positionInput.value  = u.position  || '';
+        genderInput.value    = u.gender    || '';
+        roleInput.value      = u.role      || '';
+        birthDateInput.value = u.birthDate || '';
+      } catch {
+        document.getElementById('message').innerHTML = '<div class="alert alert-error">Не удалось загрузить данные пользователя</div>';
+      }
+    }
+  }
+
+  function hideForm() {
+    formSection.classList.add('hidden');
+    listSection.classList.remove('hidden');
+    document.getElementById('selectAll').checked = false;
+    loadUsers();
+  }
+
+  // Удалить выбранных
+  async function deleteSelected() {
+    const selected = Array.from(document.querySelectorAll('#usersTable input[type=checkbox]:checked')).map(cb => cb.dataset.id);
+    if (!selected.length) { alert('Выберите хотя бы одного пользователя'); return; }
+    if (!confirm(`Удалить ${selected.length} пользователей?`)) return;
+    try {
+      await Promise.all(selected.map(id => fetch(`/api/users/${id}`, { method: 'DELETE' })));
+      loadUsers();
+    } catch {
+      alert('Ошибка при удалении');
+    }
+  }
+
+  // Обработчики кнопок
+  document.getElementById('btnCreate').onclick = () => showForm('create');
+  document.getElementById('btnEdit').onclick   = () => showForm('edit');
+  document.getElementById('btnDelete').onclick = () => deleteSelected();
+  document.getElementById('btnCancel').onclick = hideForm;
+
+  // Отправка формы
+  document.getElementById('userForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    const messageDiv = document.getElementById('message');
+    messageDiv.innerHTML = '';
+    const dto = {
+      firstName: firstNameInput.value,
+      lastName:  lastNameInput.value,
+      phone:     phoneInput.value,
+      email:     emailInput.value,
+      position:  positionInput.value,
+      gender:    genderInput.value,
+      role:      roleInput.value,
+      birthDate: birthDateInput.value
+    };
+    const url = editUserId ? `/api/users/${editUserId}` : '/api/users';
+    const method = editUserId ? 'PUT' : 'POST';
+    try {
+      const resp = await fetch(url, { method, headers: {'Content-Type':'application/json'}, body: JSON.stringify(dto) });
+      if (resp.ok) {
+        messageDiv.innerHTML = '<div class="alert alert-success">Успешно сохранено</div>';
+        setTimeout(hideForm, 1000);
+      } else {
+        messageDiv.innerHTML = `<div class="alert alert-error">Ошибка ${resp.status}</div>`;
+      }
+    } catch {
+      messageDiv.innerHTML = '<div class="alert alert-error">Сетевая ошибка</div>';
+    }
+  });
+
+  // Инициализация
+  window.onload = () => {
+    loadUsers();
+    document.getElementById('selectAll').addEventListener('change', function() {
+      document.querySelectorAll('#usersTable input[type=checkbox]').forEach(cb => cb.checked = this.checked);
+    });
+  };
+</script>
+</body>
+</html>

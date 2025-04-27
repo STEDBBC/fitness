@@ -1,4 +1,4 @@
-package com.example.demo.model.Service;
+package com.example.demo.model.entity;
 
 import lombok.Data;
 import com.example.demo.model.Role;
