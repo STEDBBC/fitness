@@ -31,12 +31,8 @@ public class UserData {
     @Column(name = "birth_date", nullable = false)
     private LocalDate birthDate;
 
-
     @Column(name="phone", nullable=false)
     private String phone;
-
-    @Column(name="position", nullable=false)
-    private String position;
 
     @Column(name="gender", nullable=false)
     private String gender;
@@ -47,5 +43,8 @@ public class UserData {
     @Enumerated(EnumType.STRING)
     @Column(nullable=false)
     private Role role;
+
+    @Column(nullable = false)
+    private String password;
 
 }

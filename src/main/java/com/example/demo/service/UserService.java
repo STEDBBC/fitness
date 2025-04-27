@@ -61,7 +61,6 @@ public class UserService {
         existing.setLastName(dto.getLastName());
         existing.setPhone(dto.getPhone());
         existing.setEmail(dto.getEmail());
-        existing.setPosition(dto.getPosition());
         existing.setGender(dto.getGender());
         existing.setRole(dto.getRole());
         existing.setBirthDate(dto.getBirthDate());
