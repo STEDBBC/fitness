@@ -1,4 +1,4 @@
-package model;
+package com.example.demo.model;
 
 /**
  * Перечисление ролей пользователей в системе.

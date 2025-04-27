@@ -1,12 +1,12 @@
-package service;
+package com.example.demo.service;
 
 import jakarta.transaction.Transactional;
 import java.util.List;
-import mapper.UserMapper;
-import model.DTO.UserDto;
-import model.Role;
-import model.Data.UserData;
-import matrix.repository.UserRepository;
+import com.example.demo.mapper.UserMapper;
+import com.example.demo.model.DTO.UserDto;
+import com.example.demo.model.Role;
+import com.example.demo.model.Data.UserData;
+import com.example.demo.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
 @Service

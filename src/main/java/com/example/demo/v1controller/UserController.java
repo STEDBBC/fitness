@@ -1,15 +1,15 @@
-package v1controller;
+package com.example.demo.v1controller;
 
 import jakarta.validation.Valid;
 import java.net.URI;
-import model.DTO.UserDto;
+import com.example.demo.model.DTO.UserDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-import service.UserService;
+import com.example.demo.service.UserService;
 
 @RestController
 @RequestMapping("/api/users")

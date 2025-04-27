@@ -1,4 +1,4 @@
-package model.Data;
+package com.example.demo.model.Data;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,13 +9,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-import jakarta.validation.constraints.NotBlank;
+import java.time.LocalDate;
 import lombok.Data;
-import model.Role;
+import com.example.demo.model.Role;
 
 @Data
 @Entity
-@Table(name = "clients")
+@Table(name = "users")
 public class UserData {
 
     @Id
@@ -27,6 +27,10 @@ public class UserData {
 
     @Column(name="last_name", nullable=false)
     private String lastName;
+
+    @Column(name = "birth_date", nullable = false)
+    private LocalDate birthDate;
+
 
     @Column(name="phone", nullable=false)
     private String phone;

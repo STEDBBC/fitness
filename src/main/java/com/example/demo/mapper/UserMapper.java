@@ -1,8 +1,8 @@
-package mapper;
+package com.example.demo.mapper;
 
-import model.DTO.UserDto;
-import model.Data.UserData;
-import model.Service.User;
+import com.example.demo.model.DTO.UserDto;
+import com.example.demo.model.Data.UserData;
+import com.example.demo.model.Service.User;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")

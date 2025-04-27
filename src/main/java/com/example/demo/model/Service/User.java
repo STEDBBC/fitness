@@ -1,7 +1,7 @@
-package model.Service;
+package com.example.demo.model.Service;
 
 import lombok.Data;
-import model.Role;
+import com.example.demo.model.Role;
 
 @Data
 public class User {

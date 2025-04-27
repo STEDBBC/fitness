@@ -1,11 +1,12 @@
-package model.DTO;
+package com.example.demo.model.DTO;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
+import java.time.LocalDate;
 import lombok.Data;
-import model.Role;
+import com.example.demo.model.Role;
 
 @Data
 public class UserDto {
@@ -16,6 +17,9 @@ public class UserDto {
 
     @NotBlank(message = "Фамилия не должна быть пустой")
     private String lastName;
+
+    @NotNull(message = "Дата рождения обязательна")
+    private LocalDate birthDate;
 
     @Pattern(
         regexp = "\\+?\\d{10,15}",
