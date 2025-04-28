@@ -38,10 +38,9 @@ public class SecurityConfig {
                 .anyRequest().authenticated()
             )
             .formLogin(form -> form
-                .loginPage("/login.html")           // GET /login.html — ваша форма
-                .loginProcessingUrl("/login")       // POST /login — сюда отправляем форму
-                .defaultSuccessUrl("/manage-users.html", true)
-                .failureUrl("/login.html?error")    // опционально для ?error
+                .loginPage("/login")
+                .loginProcessingUrl("/login")
+                .defaultSuccessUrl("/admin.html", true)
                 .permitAll()
             )
             .logout(logout -> logout

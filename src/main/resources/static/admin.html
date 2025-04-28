@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Center - Админ-панель</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; background: #f0f2f5; color: #333; }
+    header { background: #1e1e2f; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    header h1 { font-size: 1.8rem; }
+    header .logout-btn { background: transparent; border: 1px solid #fff; color: #fff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    header .logout-btn:hover { background: #fff; color: #1e1e2f; }
+    nav { background: #2d2d44; color: #fff; width: 200px; min-height: 100vh; position: fixed; top: 0; left: 0; padding-top: 100px; }
+    nav ul { list-style: none; }
+    nav li { margin: 1rem 0; }
+    nav a { color: #fff; text-decoration: none; padding: 0.5rem 1rem; display: block; }
+    nav a:hover, nav a.active { background: #44476a; }
+    .main { margin-left: 200px; padding: 2rem; margin-top: 80px; }
+    footer { text-align: center; padding: 1rem 0; color: #777; font-size: 0.9rem; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Админ-панель Fitness Center</h1>
+  <button class="logout-btn" onclick="logout()">Выйти</button>
+</header>
+<nav>
+  <ul>
+    <li><a href="manage-users.html" class="active">Клиенты</a></li>
+    <li><a href="manage-halls.html">Залы</a></li>
+    <li><a href="manage-schedule.html">Расписание</a></li>
+    <li><a href="manage-subscriptions.html">Абонементы</a></li>
+  </ul>
+</nav>
+<div class="main">
+  <h2>Добро пожаловать, Admin!</h2>
+  <p>Используйте боковое меню для навигации по разделам админ-панели.</p>
+  <!-- Здесь можно разместить статистику или быстрые ссылки -->
+  <div style="display: flex; gap: 1rem; margin-top: 1rem;">
+    <div style="flex: 1; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h3>Всего клиентов</h3>
+      <p id="statClients">...</p>
+    </div>
+    <div style="flex: 1; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h3>Всего залов</h3>
+      <p id="statHalls">...</p>
+    </div>
+    <div style="flex: 1; padding: 1rem; background: #fff; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+      <h3>Всего занятий</h3>
+      <p id="statSchedule">...</p>
+    </div>
+  </div>
+</div>
+<footer>&copy; 2025 Fitness Center</footer>
+
+<script>
+  function logout() {
+    window.location = '/logout';
+  }
+
+  // Пример загрузки статистики
+  async function loadStats() {
+    try {
+      const clients = await fetch('/api/users').then(r=>r.json()).then(arr=>arr.length);
+      const halls   = await fetch('/api/halls').then(r=>r.json()).then(arr=>arr.length);
+      const schedule= await fetch('/api/schedule').then(r=>r.json()).then(arr=>arr.length);
+      document.getElementById('statClients').textContent = clients;
+      document.getElementById('statHalls').textContent   = halls;
+      document.getElementById('statSchedule').textContent= schedule;
+    } catch (e) {
+      console.error('Ошибка при загрузке статистики', e);
+    }
+  }
+
+  window.onload = loadStats;
+</script>
+</body>
+</html>

@@ -8,6 +8,7 @@ import com.example.demo.model.data.UserData;
 import com.example.demo.repository.UserRepository;
 import java.util.stream.Collectors;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,11 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
+    private final PasswordEncoder passwordEncoder;
 
     public UserService(UserRepository userRepository,
-                       UserMapper userMapper) {
+                       UserMapper userMapper,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<UserData> getTrainers() {
@@ -31,6 +35,7 @@ public class UserService {
     @Transactional
     public UserDto createUser(UserDto dto) {
         UserData userData = userMapper.toData(dto);
+        userData.setPassword(passwordEncoder.encode(dto.getPassword()));
         return userMapper.toDTO(userRepository.save(userData));
     }
 
@@ -64,6 +69,7 @@ public class UserService {
         existing.setGender(dto.getGender());
         existing.setRole(dto.getRole());
         existing.setBirthDate(dto.getBirthDate());
+        existing.setPassword(passwordEncoder.encode(dto.getPassword()));
 
         // 3) Сохраняем и возвращаем обновлённый DTO
         UserData saved = userRepository.save(existing);
