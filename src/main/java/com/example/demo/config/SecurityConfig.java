@@ -31,7 +31,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
                 // разрешаем форму и её обработку
-                .requestMatchers("/login.html", "/login").permitAll()
+                .requestMatchers("/login.html", "/register.html", "/login").permitAll()
                 .requestMatchers("/css/**", "/js/**").permitAll()
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/**", "/manage-users.html", "/manage-halls.html").hasRole("ADMIN")

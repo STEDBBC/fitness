@@ -27,11 +27,6 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public List<UserData> getTrainers() {
-        return userRepository.findByRole(Role.TRAINER);
-    }
-
-
     @Transactional
     public UserDto createUser(UserDto dto) {
         UserData userData = userMapper.toData(dto);
@@ -93,6 +88,15 @@ public class UserService {
     @Transactional
     public List<UserDto> getAllUsers() {
         return userRepository.findAll().stream()
+            .map(userMapper::toDTO)
+            .collect(Collectors.toList());
+    }
+
+    /** Возвращает только тренеров */
+    @Transactional(readOnly = true)
+    public List<UserDto> getTrainers() {
+        return userRepository.findByRole(Role.TRAINER)
+            .stream()
             .map(userMapper::toDTO)
             .collect(Collectors.toList());
     }
