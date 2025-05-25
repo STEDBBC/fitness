@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>Fitness Center — Управление абонементами</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin:0; padding:0; }
+    body { font-family:'Roboto',sans-serif; background:#f0f2f5; color:#333; }
+    header { background:#1e1e2f; color:#fff; padding:1rem 2rem; text-align:center; }
+    header h1 { font-size:1.8rem; }
+    .container { max-width:900px; margin:2rem auto; background:#fff; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); padding:2rem; }
+    .toolbar { margin-bottom:1rem; }
+    .toolbar button { margin-right:0.5rem; padding:0.5rem 1rem; border:none; border-radius:4px; font-size:0.9rem; cursor:pointer; }
+    .btn-create{background:#28a745;color:#fff;}
+    .btn-edit{background:#007bff;color:#fff;}
+    .btn-delete{background:#dc3545;color:#fff;}
+    .btn-create:hover{background:#218838;}
+    .btn-edit:hover{background:#0069d9;}
+    .btn-delete:hover{background:#c82333;}
+    table { width:100%; border-collapse:collapse; margin-top:1rem; }
+    th,td { padding:0.75rem; border:1px solid #ddd; text-align:left; }
+    th { background:#1e1e2f; color:#fff; }
+    .select-col { width:40px; text-align:center; }
+    .hidden { display:none; }
+    .form-group { margin-bottom:1rem; }
+    .form-group label { display:block; margin-bottom:0.5rem; font-weight:500; }
+    .required { color:red; margin-left:4px; }
+    .form-group input, .form-group textarea { width:100%; padding:0.75rem; border:1px solid #ccc; border-radius:4px; font-size:1rem; }
+    .form-group textarea { resize:vertical; }
+    .submit { background:#1e1e2f; color:#fff; padding:0.75rem; border:none; border-radius:4px; cursor:pointer; }
+    .submit:hover { background:#333; }
+    .alert { padding:1rem; border-radius:4px; margin-top:1rem; font-size:0.95rem; }
+    .alert-success { background:#d4edda; color:#155724; border:1px solid #c3e6cb; }
+    .alert-error { background:#f8d7da; color:#721c24; border:1px solid #f5c6cb; }
+    footer { text-align:center; padding:1rem 0; color:#777; font-size:0.9rem; margin-top:2rem; }
+    @media(max-width:600px){ .container{margin:1rem;padding:1.5rem;} header h1{font-size:1.4rem;} }
+  </style>
+</head>
+<body>
+<header><h1>Fitness Center — Управление абонементами</h1></header>
+<div class="container">
+  <!-- Список абонементов -->
+  <section id="list-section">
+    <div class="toolbar">
+      <button id="btnCreate" class="btn-create">Создать абонемент</button>
+      <button id="btnEdit"   class="btn-edit">Редактировать</button>
+      <button id="btnDelete" class="btn-delete">Удалить</button>
+    </div>
+    <table>
+      <thead>
+      <tr>
+        <th class="select-col"><input type="checkbox" id="selectAll"></th>
+        <th>ID</th><th>Название</th><th>Месяцев</th><th>Цена</th><th>Описание</th>
+      </tr>
+      </thead>
+      <tbody id="subsTable"></tbody>
+    </table>
+  </section>
+  <!-- Форма создания/редактирования -->
+  <section id="form-section" class="hidden">
+    <h2 id="formTitle"></h2>
+    <form id="subForm">
+      <div class="form-group">
+        <label for="name">Название<span class="required">*</span></label>
+        <input type="text" id="name" required>
+      </div>
+      <div class="form-group">
+        <label for="duration">Длительность (мес.)<span class="required">*</span></label>
+        <input type="number" id="duration" min="1" required>
+      </div>
+      <div class="form-group">
+        <label for="price">Цена<span class="required">*</span></label>
+        <input type="number" id="price" min="0.01" step="0.01" required>
+      </div>
+      <div class="form-group">
+        <label for="description">Описание</label>
+        <textarea id="description" rows="3" placeholder="Краткое описание"></textarea>
+      </div>
+      <button type="submit" class="submit">Сохранить</button>
+      <button type="button" id="btnCancel" class="submit" style="background:#6c757d;margin-left:0.5rem;">Отмена</button>
+    </form>
+    <div id="message"></div>
+  </section>
+</div>
+<footer>&copy; 2025 Fitness Center</footer>
+
+<script>
+  const listSection  = document.getElementById('list-section');
+  const formSection  = document.getElementById('form-section');
+  const formTitle    = document.getElementById('formTitle');
+  const subsTable    = document.getElementById('subsTable');
+  const selectAllCb  = document.getElementById('selectAll');
+  const nameInput    = document.getElementById('name');
+  const durationInput= document.getElementById('duration');
+  const priceInput   = document.getElementById('price');
+  const descInput    = document.getElementById('description');
+  const messageDiv   = document.getElementById('message');
+  let editId = null;
+
+  // Загрузка списка
+  async function loadSubs() {
+    subsTable.innerHTML = '';
+    try {
+      const data = await fetch('/api/subscriptions').then(r=>r.json());
+      data.forEach(s => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td class="select-col"><input type="checkbox" data-id="${s.id}"></td>
+          <td>${s.id}</td>
+          <td>${s.name}</td>
+          <td>${s.durationMonths}</td>
+          <td>${s.price}</td>
+          <td>${s.description || ''}</td>`;
+        subsTable.appendChild(tr);
+      });
+    } catch (e) {
+      subsTable.innerHTML = '<tr><td colspan="6">Ошибка загрузки данных</td></tr>';
+      console.error(e);
+    }
+  }
+
+  // Показать форму
+  function showForm(mode) {
+    listSection.classList.add('hidden');
+    formSection.classList.remove('hidden');
+    messageDiv.innerHTML = '';
+    if (mode === 'create') {
+      formTitle.textContent = 'Создать абонемент';
+      editId = null;
+      document.getElementById('subForm').reset();
+    } else {
+      const checked = document.querySelectorAll('#subsTable input:checked');
+      if (checked.length !== 1) {
+        alert('Выберите один абонемент');
+        return;
+      }
+      editId = checked[0].dataset.id;
+      formTitle.textContent = `Редактировать абонемент ID ${editId}`;
+      // загрузить данные
+      fetch(`/api/subscriptions/${editId}`)
+      .then(r => r.json())
+      .then(s => {
+        nameInput.value     = s.name;
+        durationInput.value = s.durationMonths;
+        priceInput.value    = s.price;
+        descInput.value     = s.description || '';
+      })
+      .catch(() => {
+        messageDiv.innerHTML = '<div class="alert alert-error">Не удалось загрузить</div>';
+      });
+    }
+  }
+
+  // Скрыть форму и обновить список
+  function hideForm() {
+    formSection.classList.add('hidden');
+    listSection.classList.remove('hidden');
+    selectAllCb.checked = false;
+    loadSubs();
+  }
+
+  // Удалить выбранные
+  async function deleteSelected() {
+    const ids = Array.from(document.querySelectorAll('#subsTable input:checked'))
+    .map(cb => cb.dataset.id);
+    if (!ids.length) {
+      alert('Выберите хотя бы один абонемент');
+      return;
+    }
+    if (!confirm(`Удалить ${ids.length} абонемент(ов)?`)) return;
+    try {
+      await Promise.all(ids.map(id =>
+          fetch(`/api/subscriptions/${id}`, { method:'DELETE' })
+      ));
+      loadSubs();
+    } catch {
+      alert('Ошибка при удалении');
+    }
+  }
+
+  // Обработчики
+  document.getElementById('btnCreate').onclick = () => showForm('create');
+  document.getElementById('btnEdit').onclick   = () => showForm('edit');
+  document.getElementById('btnDelete').onclick = deleteSelected;
+  document.getElementById('btnCancel').onclick = hideForm;
+
+  // Селект все чекбоксы
+  selectAllCb.addEventListener('change', function(){
+    document.querySelectorAll('#subsTable input[type=checkbox]')
+    .forEach(cb => cb.checked = this.checked);
+  });
+
+  // Отправка формы
+  document.getElementById('subForm').addEventListener('submit', async e => {
+    e.preventDefault();
+    messageDiv.innerHTML = '';
+    const dto = {
+      name:            nameInput.value,
+      durationMonths:  +durationInput.value,
+      price:           +priceInput.value,
+      description:     descInput.value.trim()
+    };
+    const url    = editId ? `/api/subscriptions/${editId}` : '/api/subscriptions';
+    const method = editId ? 'PUT' : 'POST';
+
+    try {
+      const resp = await fetch(url, {
+        method,
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify(dto)
+      });
+      if (resp.ok) {
+        messageDiv.innerHTML = '<div class="alert alert-success">Успешно сохранено</div>';
+        setTimeout(hideForm, 800);
+      } else {
+        messageDiv.innerHTML = `<div class="alert alert-error">Ошибка ${resp.status}</div>`;
+      }
+    } catch {
+      messageDiv.innerHTML = '<div class="alert alert-error">Сетевая ошибка</div>';
+    }
+  });
+
+  // Инициализация
+  window.onload = loadSubs;
+</script>
+</body>
+</html>
