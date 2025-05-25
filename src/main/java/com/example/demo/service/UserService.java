@@ -6,9 +6,7 @@ import com.example.demo.model.DTO.UserDto;
 import com.example.demo.model.Role;
 import com.example.demo.model.data.UserData;
 import com.example.demo.repository.UserRepository;
-import java.util.Optional;
 import java.util.stream.Collectors;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -21,23 +19,20 @@ public class UserService {
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
-    @Autowired
     public UserService(UserRepository userRepository,
                        UserMapper userMapper,
                        PasswordEncoder passwordEncoder) {
-        this.userRepository   = userRepository;
-        this.userMapper       = userMapper;
-        this.passwordEncoder  = passwordEncoder;
+        this.userRepository = userRepository;
+        this.userMapper = userMapper;
+        this.passwordEncoder = passwordEncoder;
     }
 
     @Transactional
     public UserDto createUser(UserDto dto) {
-        UserData u = userMapper.toData(dto);
-        u.setPassword(passwordEncoder.encode(dto.getPassword()));
-        UserData saved = userRepository.save(u);
-        return userMapper.toDTO(saved);
+        UserData userData = userMapper.toData(dto);
+        userData.setPassword(passwordEncoder.encode(dto.getPassword()));
+        return userMapper.toDTO(userRepository.save(userData));
     }
-
 
     @Transactional
     public UserDto getUserById(Integer id) {
@@ -104,14 +99,6 @@ public class UserService {
             .stream()
             .map(userMapper::toDTO)
             .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public Optional<UserDto> findByEmail(String email) {
-        return userRepository.findAll().stream()
-            .filter(u -> email.equals(u.getEmail()))
-            .map(userMapper::toDTO)
-            .findFirst();
     }
 
 }
