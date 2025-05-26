@@ -4,16 +4,75 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Fitness Center – Личный кабинет клиента</title>
+  <!-- Шрифт из Google Fonts -->
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
   <style>
-    /* скопируйте сюда ваши стили из admin.html */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', sans-serif; background: #f0f2f5; color: #333; }
-    header { background: #1e1e2f; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .logout-btn { background: transparent; border: 1px solid #fff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
-    .logout-btn:hover { background: #fff; color: #1e1e2f; }
-    .main { padding: 2rem; margin-top: 80px; }
-    footer { text-align: center; padding: 1rem 0; color: #777; font-size: 0.9rem; margin-top: 2rem; }
+    /* Базовые стили (скопированы из admin.html) */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    header {
+      background: #1e1e2f;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .logout-btn:hover {
+      background: #fff;
+      color: #1e1e2f;
+    }
+    .main {
+      padding: 2rem;
+      margin-top: 80px; /* компенсирует фиксированный header */
+      max-width: 800px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem 0;
+      color: #777;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+    /* Новый блок с балансом */
+    .balance-block {
+      background: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      margin-bottom: 2rem;
+    }
+    .balance-block h3 {
+      margin-bottom: 0.5rem;
+      font-size: 1.1rem;
+    }
+    #balance {
+      font-size: 1.5rem;
+      font-weight: bold;
+    }
   </style>
 </head>
 <body>
@@ -21,15 +80,43 @@
   <h1>Личный кабинет клиента</h1>
   <button class="logout-btn" onclick="logout()">Выйти</button>
 </header>
+
 <div class="main">
   <h2>Добро пожаловать!</h2>
-  <p>Здесь будут ваши абонементы, расписание и другая информация.</p>
+  <p>Здесь вы можете управлять своими абонементами и просматривать расписание занятий.</p>
+
+  <!-- Блок с балансом -->
+  <div class="balance-block">
+    <h3>Ваш баланс:</h3>
+    <p id="balance">Загрузка…</p>
+  </div>
+
+  <!-- Здесь позже появятся кнопки «Купить абонемент» и остальная функциональность -->
 </div>
+
 <footer>&copy; 2025 Fitness Center</footer>
+
 <script>
+  // Функция для выхода
   function logout() {
     window.location = '/logout';
   }
+
+  // Загружаем баланс с backend и вставляем в элемент #balance
+  async function loadBalance() {
+    try {
+      const resp = await fetch('/api/client/balance');
+      if (!resp.ok) throw new Error('Ошибка ' + resp.status);
+      const data = await resp.json();
+      document.getElementById('balance').innerText = data.balance;
+    } catch (e) {
+      console.error(e);
+      document.getElementById('balance').innerText = 'Не удалось загрузить';
+    }
+  }
+
+  // Когда страница готова — запускаем загрузку
+  window.addEventListener('DOMContentLoaded', loadBalance);
 </script>
 </body>
 </html>
