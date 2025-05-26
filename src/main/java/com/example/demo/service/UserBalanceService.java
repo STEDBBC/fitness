@@ -1,7 +1,13 @@
 package com.example.demo.service;
 
+import com.example.demo.mapper.SubscriptionMapper;
+import com.example.demo.model.DTO.SubscriptionDto;
+import com.example.demo.model.data.SubscriptionData;
 import com.example.demo.model.data.UserData;
 import com.example.demo.repository.UserRepository;
+import java.time.LocalDate;
+import java.util.Map;
+import java.util.NoSuchElementException;
 import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 
@@ -9,9 +15,15 @@ import java.math.BigDecimal;
 public class UserBalanceService {
 
     private final UserRepository userRepository;
+    private final SubscriptionService subscriptionService;
+    private final SubscriptionMapper subscriptionMapper;
 
-    public UserBalanceService(UserRepository userRepository) {
+    public UserBalanceService(UserRepository userRepository,
+                              SubscriptionService subscriptionService,
+                              SubscriptionMapper subscriptionMapper) {
         this.userRepository = userRepository;
+        this.subscriptionService = subscriptionService;
+        this.subscriptionMapper = subscriptionMapper;
     }
 
     /**
@@ -53,5 +65,62 @@ public class UserBalanceService {
         user.setBalance(newBalance);
         userRepository.save(user);
         return newBalance;
+    }
+
+    /**
+     * Возвращает DTO текущего абонемента пользователя или null, если нет.
+     */
+    public SubscriptionDto getCurrentSubscription(String email) {
+        UserData user = findUser(email);
+        SubscriptionData subEntity = user.getSubscription();
+        if (subEntity == null) {
+            return null;
+        }
+
+        SubscriptionDto subscriptionDto = subscriptionMapper.toDTO(subEntity);
+        subscriptionDto.setStartDate(user.getSubscriptionStartDate());
+        subscriptionDto.setEndDate(user.getSubscriptionEndDate());
+        return subscriptionDto;
+    }
+
+    /**
+     * Логика покупки:
+     * 1) Берём цену через service.getSubscriptionById (DTO-шаблон);
+     * 2) Списываем баланс;
+     * 3) Привязываем к пользователю сущность и ставим даты;
+     * 4) Возвращаем новую карту с балансом и полным DTO подписки.
+     */
+    public Map<String,Object> purchaseSubscription(String email, Integer subscriptionId) {
+        // 1) шаблон из настроек
+        SubscriptionDto template = subscriptionService.getSubscriptionById(subscriptionId);
+        BigDecimal price = template.getPrice();
+
+        // 2) списываем
+        deductBalance(email, price);
+
+        // 3) привязываем
+        UserData user = findUser(email);
+        SubscriptionData entity = subscriptionMapper.toData(subscriptionService.getSubscriptionById(subscriptionId));
+        user.setSubscription(entity);
+
+        LocalDate start = LocalDate.now();
+        user.setSubscriptionStartDate(start);
+        user.setSubscriptionEndDate(start.plusMonths(template.getDurationMonths()));
+
+        userRepository.save(user);
+
+        // 4) готовим DTO с уже заполненными датами
+        SubscriptionDto resultDto = subscriptionMapper.toDTO(user.getSubscription());
+
+        return Map.of(
+            "balance", user.getBalance(),
+            "subscription", resultDto
+        );
+    }
+
+    // Вспомогательный метод для поиска и исключения, если нет
+    private UserData findUser(String email) {
+        return userRepository.findByEmail(email)
+            .orElseThrow(() -> new NoSuchElementException("Пользователь не найден: " + email));
     }
 }
