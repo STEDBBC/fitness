@@ -37,7 +37,7 @@ public class UserData {
     @Column(name="gender", nullable=false)
     private String gender;
 
-    @Column(name="email", nullable=false)
+    @Column(name="email", nullable=false, unique=true)
     private String email;
 
     @Enumerated(EnumType.STRING)

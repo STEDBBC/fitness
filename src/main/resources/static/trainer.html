@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fitness Center – Личный кабинет тренера</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    /* те же стили, что и в client.html */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Roboto', sans-serif; background: #f0f2f5; color: #333; }
+    header { background: #1e1e2f; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
+    .logout-btn { background: transparent; border: 1px solid #fff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
+    .logout-btn:hover { background: #fff; color: #1e1e2f; }
+    .main { padding: 2rem; margin-top: 80px; }
+    footer { text-align: center; padding: 1rem 0; color: #777; font-size: 0.9rem; margin-top: 2rem; }
+  </style>
+</head>
+<body>
+<header>
+  <h1>Личный кабинет тренера</h1>
+  <button class="logout-btn" onclick="logout()">Выйти</button>
+</header>
+<div class="main">
+  <h2>Добро пожаловать, тренер!</h2>
+  <p>Здесь будут ваши группы, расписание и статистика по клиентам.</p>
+</div>
+<footer>&copy; 2025 Fitness Center</footer>
+<script>
+  function logout() {
+    window.location = '/logout';
+  }
+</script>
+</body>
+</html>
