@@ -37,5 +37,21 @@ public class UserBalanceService {
         userRepository.save(user);
     }
 
-    // позже можно добавить метод пополнения
+    /**
+     * Пополняет баланс пользователя на сумму amount.
+     * @param email — email пользователя
+     * @param amount — сумма пополнения (должна быть > 0)
+     */
+    public BigDecimal addBalance(String email, BigDecimal amount) {
+        if (amount.signum() <= 0) {
+            throw new IllegalArgumentException("Сумма пополнения должна быть положительной");
+        }
+        UserData user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new IllegalArgumentException("Пользователь не найден: " + email));
+
+        BigDecimal newBalance = user.getBalance().add(amount);
+        user.setBalance(newBalance);
+        userRepository.save(user);
+        return newBalance;
+    }
 }
