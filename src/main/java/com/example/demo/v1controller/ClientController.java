@@ -1,15 +1,18 @@
 package com.example.demo.v1controller;
 
+import com.example.demo.mapper.ScheduleMapper;
 import com.example.demo.model.DTO.AmountDto;
+import com.example.demo.model.DTO.SchedulesDto;
 import com.example.demo.model.DTO.SubscriptionDto;
-import com.example.demo.model.data.SubscriptionData;
 import com.example.demo.model.data.UserData;
 import com.example.demo.repository.UserRepository;
-import com.example.demo.service.SubscriptionService;
+import com.example.demo.service.ScheduleClientService;
 import com.example.demo.service.UserBalanceService;
 import java.math.BigDecimal;
+import java.security.Principal;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -24,9 +27,18 @@ import org.springframework.web.bind.annotation.RestController;
 public class ClientController {
 
     private final UserBalanceService userBalanceService;
+    private final ScheduleClientService scheduleClientService;
+    private final ScheduleMapper scheduleMapper;
+    private final UserRepository userRepository;
 
-    public ClientController(UserBalanceService userBalanceService) {
+    public ClientController(UserBalanceService userBalanceService,
+                            ScheduleClientService scheduleClientService,
+                            ScheduleMapper scheduleMapper,
+                            UserRepository userRepository) {
         this.userBalanceService = userBalanceService;
+        this.scheduleClientService = scheduleClientService;
+        this.scheduleMapper = scheduleMapper;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/balance")
@@ -55,5 +67,30 @@ public class ClientController {
         @PathVariable Integer id) {
         Map<String,Object> result = userBalanceService.purchaseSubscription(auth.getName(), id);
         return ResponseEntity.ok(result);
+    }
+
+    /**
+     * Получить список занятий, на которые записан текущий клиент.
+     *
+     * @param principal Spring Security Principal (имя — email клиента)
+     * @return список SchedulesDto
+     */
+    @GetMapping("/schedules")
+    public ResponseEntity<List<SchedulesDto>> getClientSchedules(Principal principal) {
+        // 1. Получаем email текущего клиента
+        String email = principal.getName();
+
+        // 2. Находим UserData по email (убедимся, что роль — CLIENT)
+        UserData client = userRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Клиент с email=" + email + " не найден"));
+
+        // 3. Берём список SchedulesData через сервис и конвертируем в DTO
+        List<SchedulesDto> dtos = scheduleClientService
+            .getSchedulesForClient(client.getId())
+            .stream()
+            .map(scheduleMapper::toDto)
+            .collect(Collectors.toList());
+
+        return ResponseEntity.ok(dtos);
     }
 }

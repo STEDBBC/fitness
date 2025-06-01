@@ -20,4 +20,7 @@ public interface ScheduleClientRepository extends JpaRepository<ScheduleClientDa
     // Добавляем этот метод:
     // Поиск конкретной «строки» (ScheduleClientData) по занятию и клиенту.
     Optional<ScheduleClientData> findByScheduleAndClient(SchedulesData schedule, UserData client);
+
+    // Найти все записи ScheduleClientData для данного клиента
+    List<ScheduleClientData> findAllByClient(UserData client);
 }

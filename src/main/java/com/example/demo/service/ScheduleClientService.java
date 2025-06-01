@@ -162,4 +162,25 @@ public class ScheduleClientService {
             .filter(client -> !alreadyRegistered.contains(client))
             .collect(Collectors.toList());
     }
+
+    /**
+     * Получить список занятий, на которые текущий клиент уже записан.
+     *
+     * @param clientId ID клиента
+     * @return список SchedulesData (объектов расписания)
+     */
+    @Transactional
+    public List<SchedulesData> getSchedulesForClient(Integer clientId) {
+        // 1. Проверяем, что пользователь существует
+        UserData client = userRepository.findById(clientId)
+            .orElseThrow(() -> new RuntimeException("Пользователь с ID=" + clientId + " не найден"));
+
+        // 2. Берём все записи из schedule_clients для этого клиента
+        List<ScheduleClientData> mappings = scheduleClientRepository.findAllByClient(client);
+
+        // 3. Из каждой записи достаём само занятие (SchedulesData)
+        return mappings.stream()
+            .map(ScheduleClientData::getSchedule)
+            .collect(Collectors.toList());
+    }
 }
