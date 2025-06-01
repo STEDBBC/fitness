@@ -1,19 +1,172 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Fitness Center – Личный кабинет тренера</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+  <link
+      href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap"
+      rel="stylesheet"
+  />
   <style>
-    /* те же стили, что и в client.html */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Roboto', sans-serif; background: #f0f2f5; color: #333; }
-    header { background: #1e1e2f; color: #fff; padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; }
-    .logout-btn { background: transparent; border: 1px solid #fff; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer; }
-    .logout-btn:hover { background: #fff; color: #1e1e2f; }
-    .main { padding: 2rem; margin-top: 80px; }
-    footer { text-align: center; padding: 1rem 0; color: #777; font-size: 0.9rem; margin-top: 2rem; }
+    /* Общие стили */
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: 'Roboto', sans-serif;
+      background: #f0f2f5;
+      color: #333;
+    }
+    header {
+      background: #1e1e2f;
+      color: #fff;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+    }
+    .logout-btn {
+      background: transparent;
+      border: 1px solid #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+      color: #fff;
+      font-weight: 500;
+    }
+    .logout-btn:hover {
+      background: #fff;
+      color: #1e1e2f;
+    }
+    .main {
+      padding: 2rem;
+      margin-top: 80px; /* чтобы не закрыть контент под фиксированным header */
+    }
+    h2 {
+      margin-bottom: 1rem;
+    }
+    footer {
+      text-align: center;
+      padding: 1rem 0;
+      color: #777;
+      font-size: 0.9rem;
+      margin-top: 2rem;
+    }
+
+    /* Стили для таблиц */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 2rem;
+      background: #fff;
+      border-radius: 4px;
+      overflow: hidden;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    th,
+    td {
+      padding: 0.75rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 0.95rem;
+    }
+    th {
+      background: #1e1e2f;
+      color: #fff;
+      font-weight: 500;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+    tr:hover td {
+      background: #f9f9f9;
+    }
+    .btn {
+      padding: 0.4rem 0.8rem;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.9rem;
+      font-weight: 500;
+    }
+    .btn-primary {
+      background: #1e1e2f;
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background: #33334a;
+    }
+    .btn-danger {
+      background: #e74c3c;
+      color: #fff;
+    }
+    .btn-danger:hover {
+      background: #c0392b;
+    }
+    .btn-secondary {
+      background: #6c7ae0;
+      color: #fff;
+    }
+    .btn-secondary:hover {
+      background: #5760d8;
+    }
+
+    /* Контейнер списка клиентов (появляется при выборе занятия) */
+    #clients-container {
+      display: none;
+      margin-top: 2rem;
+      background: #fff;
+      padding: 1rem 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+    #clients-container h3 {
+      margin-bottom: 1rem;
+    }
+    #clients-list {
+      margin-bottom: 1.5rem;
+    }
+
+    /* ---------- Изменили здесь: ---------- */
+    #add-client-form {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.5rem;
+    }
+    #client-select {
+      padding: 0.5rem;
+      font-size: 0.95rem;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      min-width: 200px;
+    }
+    /* ------------------------------------ */
+
+    /* Уведомления */
+    .notification {
+      margin-bottom: 1rem;
+      padding: 0.75rem 1rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+    .notification.success {
+      background: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
+    }
+    .notification.error {
+      background: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
+    }
   </style>
 </head>
 <body>
@@ -21,14 +174,308 @@
   <h1>Личный кабинет тренера</h1>
   <button class="logout-btn" onclick="logout()">Выйти</button>
 </header>
+
 <div class="main">
-  <h2>Добро пожаловать, тренер!</h2>
-  <p>Здесь будут ваши группы, расписание и статистика по клиентам.</p>
+  <h2>Ваши занятия</h2>
+  <div id="notification-area"></div>
+  <div id="schedules-container">
+    <!-- Сюда будет подгружаться таблица занятий -->
+  </div>
+
+  <div id="clients-container">
+    <h3>Клиенты на занятии <span id="selected-schedule-info"></span></h3>
+    <div id="clients-list">
+      <!-- Здесь будет список уже записанных клиентов -->
+    </div>
+
+    <!-- ---------- Изменённая форма: выпадающий список вместо input ---------- -->
+    <form id="add-client-form">
+      <label for="client-select">Добавить клиента:</label>
+      <select id="client-select">
+        <!-- сюда динамически подставятся <option> с { id, имя, фамилия }</select> -->
+      </select>
+      <button type="button" class="btn btn-primary" onclick="addClient()">Добавить</button>
+    </form>
+    <!-- ---------------------------------------------------------------------- -->
+
+    <button type="button" class="btn btn-secondary" onclick="closeClients()">Закрыть</button>
+  </div>
 </div>
+
 <footer>&copy; 2025 Fitness Center</footer>
+
 <script>
+  // Текущий выбранный scheduleId
+  let currentScheduleId = null;
+
+  // При загрузке страницы сразу подгружаем расписание
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchSchedules();
+  });
+
+  // Функция для выхода (логаута)
   function logout() {
     window.location = '/logout';
+  }
+
+  // Служебная функция: показать уведомление (success или error)
+  function showNotification(message, type = 'success') {
+    const area = document.getElementById('notification-area');
+    area.innerHTML = '';
+    const div = document.createElement('div');
+    div.className = `notification ${type}`;
+    div.textContent = message;
+    area.appendChild(div);
+    // Через 3 секунды убрать
+    setTimeout(() => (area.innerHTML = ''), 3000);
+  }
+
+  // Получить список занятий тренера
+  async function fetchSchedules() {
+    try {
+      const response = await fetch('/api/v1/trainer/schedules', {
+        credentials: 'include'
+      });
+      if (!response.ok) {
+        throw new Error('Не удалось загрузить расписание');
+      }
+      const schedules = await response.json();
+      renderSchedulesTable(schedules);
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
+  }
+
+  // Рендерим таблицу занятий
+  function renderSchedulesTable(schedules) {
+    const container = document.getElementById('schedules-container');
+    container.innerHTML = ''; // очистить
+
+    if (schedules.length === 0) {
+      container.textContent = 'У вас пока нет запланированных занятий.';
+      return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+          <th>ID</th>
+          <th>Дата</th>
+          <th>Начало</th>
+          <th>Конец</th>
+          <th>Активность</th>
+          <th>Зал</th>
+          <th>Статус</th>
+          <th>Клиенты</th>
+        </tr>
+      `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    schedules.forEach(sch => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+          <td>${sch.id}</td>
+          <td>${sch.date}</td>
+          <td>${sch.startTime}</td>
+          <td>${sch.endTime}</td>
+          <td>${sch.activityType}</td>
+          <td>${sch.hallName || sch.hallId}</td>
+          <td>${sch.status}</td>
+          <td>
+            <button class="btn btn-primary" onclick="openClients(${sch.id}, '${sch.date}', '${sch.startTime}')">
+              Управлять
+            </button>
+          </td>
+        `;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    container.appendChild(table);
+  }
+
+  // Открыть секцию управления клиентами для конкретного занятия
+  function openClients(scheduleId, date, startTime) {
+    currentScheduleId = scheduleId;
+    document.getElementById('selected-schedule-info').textContent =
+        `ID=${scheduleId}, ${date} ${startTime}`;
+    document.getElementById('clients-container').style.display = 'block';
+
+    // На старте подгружаем:
+    // 1. Список уже записанных клиентов
+    fetchClients(scheduleId);
+    // 2. Список «eligible» клиентов для выпадающего списка
+    fetchEligibleClients(scheduleId);
+  }
+
+  // Закрыть секцию управления клиентами
+  function closeClients() {
+    currentScheduleId = null;
+    document.getElementById('clients-container').style.display = 'none';
+    document.getElementById('clients-list').innerHTML = '';
+    // Очистим выпадающий список
+    const select = document.getElementById('client-select');
+    select.innerHTML = '';
+  }
+
+  // Получить список клиентов, записанных на занятие
+  async function fetchClients(scheduleId) {
+    try {
+      const response = await fetch(
+          `/api/v1/trainer/schedules/${scheduleId}/clients`,
+          { credentials: 'include' }
+      );
+      if (!response.ok) {
+        throw new Error('Не удалось получить список клиентов');
+      }
+      const clients = await response.json();
+      renderClientsList(clients);
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
+  }
+
+  // Рендер списка уже записанных клиентов
+  function renderClientsList(clients) {
+    const listDiv = document.getElementById('clients-list');
+    listDiv.innerHTML = ''; // очистить
+
+    if (clients.length === 0) {
+      listDiv.textContent = 'Пока нет записанных клиентов.';
+      return;
+    }
+
+    const table = document.createElement('table');
+    const thead = document.createElement('thead');
+    thead.innerHTML = `
+        <tr>
+          <th>ID</th>
+          <th>Имя</th>
+          <th>Фамилия</th>
+          <th>Email</th>
+          <th>Удалить</th>
+        </tr>
+      `;
+    table.appendChild(thead);
+
+    const tbody = document.createElement('tbody');
+    clients.forEach(client => {
+      const tr = document.createElement('tr');
+      tr.innerHTML = `
+          <td>${client.id}</td>
+          <td>${client.firstName}</td>
+          <td>${client.lastName}</td>
+          <td>${client.email}</td>
+          <td>
+            <button class="btn btn-danger" onclick="removeClient(${client.id})">
+              Удалить
+            </button>
+          </td>
+        `;
+      tbody.appendChild(tr);
+    });
+    table.appendChild(tbody);
+    listDiv.appendChild(table);
+  }
+
+  // Получить список «eligible» клиентов (для выпадающего списка)
+  async function fetchEligibleClients(scheduleId) {
+    try {
+      const response = await fetch(
+          `/api/v1/trainer/schedules/${scheduleId}/eligible-clients`,
+          { credentials: 'include' }
+      );
+      if (!response.ok) {
+        throw new Error('Не удалось получить список доступных клиентов');
+      }
+      const eligible = await response.json();
+      renderEligibleClientsDropdown(eligible);
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
+  }
+
+  // Рендерим выпадающий список <select> с «eligible» клиентами
+  function renderEligibleClientsDropdown(clients) {
+    const select = document.getElementById('client-select');
+    select.innerHTML = ''; // Очистили предыдущие <option>
+
+    // Первый пустой option (чтобы было видно placeholder)
+    const placeholder = document.createElement('option');
+    placeholder.value = '';
+    placeholder.textContent = 'Выберите клиента';
+    placeholder.disabled = true;
+    placeholder.selected = true;
+    select.appendChild(placeholder);
+
+    // Для каждого клиента добавляем option с value=ID и текстом «Имя Фамилия (ID)»
+    clients.forEach(client => {
+      const option = document.createElement('option');
+      option.value = client.id;
+      option.textContent = `${client.firstName} ${client.lastName} (ID:${client.id})`;
+      select.appendChild(option);
+    });
+  }
+
+  // Добавить выбранного клиента на занятие
+  async function addClient() {
+    const select = document.getElementById('client-select');
+    const clientId = +select.value; // ID выбранного из <select>
+    if (!clientId) {
+      showNotification('Пожалуйста, выберите клиента из списка', 'error');
+      return;
+    }
+    if (!currentScheduleId) {
+      showNotification('Нечего добавить: выберите занятие', 'error');
+      return;
+    }
+
+    try {
+      const response = await fetch(
+          `/api/v1/trainer/schedules/${currentScheduleId}/clients/${clientId}`,
+          {
+            method: 'POST',
+            credentials: 'include',
+            headers: { 'Content-Type': 'application/json' }
+          }
+      );
+      if (!response.ok) {
+        // Пробуем получить текст ошибки
+        const errText = await response.text();
+        throw new Error(errText || 'Ошибка при добавлении клиента');
+      }
+      showNotification('Клиент успешно добавлен');
+      // После добавления — обновляем и список записанных, и список «eligible»
+      fetchClients(currentScheduleId);
+      fetchEligibleClients(currentScheduleId);
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
+  }
+
+  // Удалить клиента из занятия
+  async function removeClient(clientId) {
+    if (!currentScheduleId) return;
+    try {
+      const response = await fetch(
+          `/api/v1/trainer/schedules/${currentScheduleId}/clients/${clientId}`,
+          {
+            method: 'DELETE',
+            credentials: 'include'
+          }
+      );
+      if (!response.ok) {
+        const errText = await response.text();
+        throw new Error(errText || 'Ошибка при удалении клиента');
+      }
+      showNotification('Клиент удалён');
+      // После удаления — снова обновляем оба списка
+      fetchClients(currentScheduleId);
+      fetchEligibleClients(currentScheduleId);
+    } catch (err) {
+      showNotification(err.message, 'error');
+    }
   }
 </script>
 </body>
